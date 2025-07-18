@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bulma/css/bulma.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
@@ -7,8 +7,72 @@ import { TodoList } from './components/TodoList';
 import { TodoFilter } from './components/TodoFilter';
 import { TodoModal } from './components/TodoModal';
 import { Loader } from './components/Loader';
+import { getTodos } from './api';
+import { Todo } from './types/Todo';
 
 export const App: React.FC = () => {
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [select, setSelect] = useState<string>('all');
+  const [query, setQuery] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState<Todo>();
+
+  useEffect(() => {
+    setLoading(true);
+
+    getTodos()
+      .then(todosApi => {
+        switch (select) {
+          case 'all':
+            setTodos(todosApi);
+            break;
+          case 'completed':
+            setTodos(todosApi.filter(todo => todo.completed));
+            break;
+          case 'active':
+            setTodos(todosApi.filter(todo => !todo.completed));
+            break;
+          default:
+            break;
+        }
+
+        if (query) {
+          setTodos(prevTodos =>
+            prevTodos.filter(todo =>
+              todo.title.toLowerCase().includes(query.toLowerCase()),
+            ),
+          );
+        }
+        // setTodos(todosApi);
+      })
+      .catch(error => setErrorMessage(error.message))
+      .finally(() => {
+        setLoading(false);
+      });
+
+    return () => {};
+  }, [select, query]);
+
+  const handleTodoClick = (id: number) => {
+    setShowModal(!showModal);
+
+    if (showModal) {
+      setSelectedTodo(undefined);
+
+      return;
+    }
+
+    if (id) {
+      const selectedTodoFetch = todos.find(todo => todo.id === id);
+
+      if (selectedTodoFetch) {
+        setSelectedTodo(selectedTodoFetch);
+      }
+    }
+  };
+
   return (
     <>
       <div className="section">
@@ -17,18 +81,29 @@ export const App: React.FC = () => {
             <h1 className="title">Todos:</h1>
 
             <div className="block">
-              <TodoFilter />
+              <TodoFilter
+                select={select}
+                setSelect={setSelect}
+                query={query}
+                setQuery={setQuery}
+              />
             </div>
 
             <div className="block">
-              <Loader />
-              <TodoList />
+              {loading && <Loader />}
+              {!loading && !errorMessage && (
+                <TodoList
+                  todos={todos}
+                  onClick={handleTodoClick}
+                  todoSet={selectedTodo}
+                />
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      <TodoModal />
+      {showModal && <TodoModal onClick={handleTodoClick} todo={selectedTodo} />}
     </>
   );
 };
