@@ -54,21 +54,11 @@ export const App: React.FC = () => {
   }, [select, query]);
 
   const handleTodoClick = (id: number) => {
-    // setShowModal(!showModal);
     setShowModal(true);
-
-    // if (showModal) {
-    //   setSelectedTodo(undefined);
-
-    //   return;
-    // }
-
-    // if (id) {
     const selectedTodoFetch = todos.find(todo => todo.id === id);
 
     if (selectedTodoFetch) {
       setSelectedTodo(selectedTodoFetch);
-      // }
     }
   };
 
