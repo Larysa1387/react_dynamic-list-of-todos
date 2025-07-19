@@ -24,28 +24,28 @@ export const App: React.FC = () => {
 
     getTodos()
       .then(todosApi => {
+        let filteredTodos = todosApi;
+
         switch (select) {
-          case 'all':
-            setTodos(todosApi);
-            break;
+          // case 'all':
+          //   setTodos(todosApi);
+          //   break;
           case 'completed':
-            setTodos(todosApi.filter(todo => todo.completed));
+            filteredTodos = filteredTodos.filter(todo => todo.completed);
             break;
           case 'active':
-            setTodos(todosApi.filter(todo => !todo.completed));
+            filteredTodos = filteredTodos.filter(todo => !todo.completed);
             break;
           default:
             break;
         }
 
         if (query) {
-          setTodos(prevTodos =>
-            prevTodos.filter(todo =>
-              todo.title.toLowerCase().includes(query.toLowerCase()),
-            ),
+          filteredTodos = filteredTodos.filter(todo =>
+            todo.title.toLowerCase().includes(query.toLowerCase()),
           );
         }
-        // setTodos(todosApi);
+        setTodos(filteredTodos);
       })
       .catch(error => setErrorMessage(error.message))
       .finally(() => {
