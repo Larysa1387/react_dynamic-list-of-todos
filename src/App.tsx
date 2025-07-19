@@ -54,21 +54,27 @@ export const App: React.FC = () => {
   }, [select, query]);
 
   const handleTodoClick = (id: number) => {
-    setShowModal(!showModal);
+    // setShowModal(!showModal);
+    setShowModal(true);
 
-    if (showModal) {
-      setSelectedTodo(undefined);
+    // if (showModal) {
+    //   setSelectedTodo(undefined);
 
-      return;
+    //   return;
+    // }
+
+    // if (id) {
+    const selectedTodoFetch = todos.find(todo => todo.id === id);
+
+    if (selectedTodoFetch) {
+      setSelectedTodo(selectedTodoFetch);
+      // }
     }
+  };
 
-    if (id) {
-      const selectedTodoFetch = todos.find(todo => todo.id === id);
-
-      if (selectedTodoFetch) {
-        setSelectedTodo(selectedTodoFetch);
-      }
-    }
+  const handleModalClose = () => {
+    setShowModal(false);
+    setSelectedTodo(undefined);
   };
 
   return (
@@ -101,7 +107,9 @@ export const App: React.FC = () => {
         </div>
       </div>
 
-      {showModal && <TodoModal onClick={handleTodoClick} todo={selectedTodo} />}
+      {showModal && (
+        <TodoModal onClick={handleModalClose} todo={selectedTodo} />
+      )}
     </>
   );
 };
