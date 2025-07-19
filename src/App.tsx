@@ -27,9 +27,6 @@ export const App: React.FC = () => {
         let filteredTodos = todosApi;
 
         switch (select) {
-          // case 'all':
-          //   setTodos(todosApi);
-          //   break;
           case 'completed':
             filteredTodos = filteredTodos.filter(todo => todo.completed);
             break;
@@ -45,6 +42,7 @@ export const App: React.FC = () => {
             todo.title.toLowerCase().includes(query.toLowerCase()),
           );
         }
+
         setTodos(filteredTodos);
       })
       .catch(error => setErrorMessage(error.message))
